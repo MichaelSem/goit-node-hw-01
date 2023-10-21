@@ -1,3 +1,5 @@
+const fs = require("fs").promises;
+const path = require("path");
 const {
   listContacts,
   getContactById,
@@ -19,26 +21,34 @@ program.parse(process.argv);
 const argv = program.opts();
 
 // TODO: рефакторить
-function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case "list":
-      listContacts();
-      break;
+async function invokeAction({ action, id, name, email, phone }) {
+  try {
+    switch (action) {
+      case "list":
+        const list = await listContacts();
+        console.table(list);
+        break;
 
-    case "get":
-      getContactById(id);
-      break;
+      case "get":
+        const contact = await getContactById(id);
+        console.table(contact);
+        break;
 
-    case "add":
-      addContact(name, email, phone);
-      break;
+      case "add":
+        const newContact = await addContact(name, email, phone);
+        console.table(newContact);
+        break;
 
-    case "remove":
-      removeContact(id);
-      break;
+      case "remove":
+        const removedContact = await removeContact(id);
+        console.table(removedContact);
+        break;
 
-    default:
-      console.warn("\x1B[31m Unknown action type!");
+      default:
+        console.warn("\x1B[31m Unknown action type!");
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
